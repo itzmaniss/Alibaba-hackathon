@@ -15,7 +15,7 @@
         <div style = "color: #f5cda7; font-size: 47px; padding: 120px 30px;">
             Your AI powered ally for respiratory health
         </div>
-        <form>
+        <form id="uploadForm" enctype="multipart/form-data">
             <div style = "background-color: #4f9d69; 
             border: 2px dashed #68d89b; 
             padding: 100px 50px; 
@@ -23,9 +23,14 @@
             cursor: pointer;
             font-size: 47px" class = "file-upload-box">
                 <input type="file" name="file" id="audioFile" style = "display: none;"/>
-                Drop your audio file
+                <p id="fileStatus">Drop your audio file</p>
+            </div>
+
+            <div>
+                <button id="submit" type="submit">Submit</button>
             </div>
         </form>
+
     </body>
 
     <footer style = "color: #f5cda7">
@@ -40,8 +45,19 @@
     </footer>
 
     <script>
+        const uploadForm = document.getElementById("uploadForm");
         const fileUploadBox = document.querySelector(".file-upload-box");
         const fileInput = document.getElementById("audioFile");
+
+        const checkFile = (file) => {
+            if (!file.type.startsWith("audio/")) {
+                alert("Please Drop only audio files.");
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
 
         fileUploadBox.addEventListener("click", () => fileInput.click());
 
@@ -51,13 +67,47 @@
         });
 
         fileUploadBox.addEventListener("drop", (e) => {
-            const file = e.dataTransfer.files;
-            if (!file.type.startWith("audio/")) {
-                alert("Please Drop only audio files.");
+            e.preventDefault();
+            const file = e.dataTransfer.files[0];
+            if (!checkFile(file)) {
                 return;
             }
-            console.log(file)
-        })
+            document.getElementById('fileStatus').textContent = file.name;
+        });
+
+        submit.addEventListener("click", (e) => {
+            e.preventDefault();
+            
+            const file = fileInput.files[0];
+            if (!checkFile) {return;}
+
+            process(file);
+        });
+
+        async function process(file) {
+            const formData = new FormData(uploadForm);
+            try {
+            const response = await fetch('/assess', {
+                method: 'POST',
+                body: formData 
+            });
+
+            if (response.ok) {
+                const result = await response.json(); 
+                console.log("API Response:", result);
+
+
+                displayResults(result); 
+            } 
+            else {
+                console.error("API Error:", response.status);
+            }
+
+        } 
+            catch (error) {
+                console.error("Error sending file:", error);
+            }
+    }
 
     </script>  
 
