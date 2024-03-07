@@ -15,21 +15,17 @@
         <div style = "color: #f5cda7; font-size: 47px; padding: 120px 30px;">
             Your AI powered ally for respiratory health
         </div>
-        <div style = "background-color: #4f9d69; 
-        border: 2px dashed #68d89b; 
-        padding: 100px 50px; 
-        text-align: center; 
-        cursor: pointer;
-        font-size: 47px" class = "file-upload-box">
-           <!-- <canvas id="waveform" style = "width: 100%;
-            height: 100%;
-            z-index: -1;
-            position: absolute;
-            top: 0;
-            left: 0;"></canvas> -->
-            <input type="file" name="file" id="audioFile" style = "display: none;"/>
-            Drop your audio file
-        </div>
+        <form>
+            <div style = "background-color: #4f9d69; 
+            border: 2px dashed #68d89b; 
+            padding: 100px 50px; 
+            text-align: center; 
+            cursor: pointer;
+            font-size: 47px" class = "file-upload-box">
+                <input type="file" name="file" id="audioFile" style = "display: none;"/>
+                Drop your audio file
+            </div>
+        </form>
     </body>
 
     <footer style = "color: #f5cda7">
@@ -45,37 +41,26 @@
 
     <script>
         const fileUploadBox = document.querySelector(".file-upload-box");
-        const fileInput = document.getElementById("audioFile")
-        fileUploadBox.addEventListener("click", () => fileInput.click())
-        const canvas = document.getElementById('waveformCanvas');
-        const ctx = canvas.getContext('2d');
-        const width = canvas.width = window.innerWidth;  // Make it full width
-        const height = canvas.height = 200; // Example height
+        const fileInput = document.getElementById("audioFile");
 
-        let offset = 0; // To control the graph's movement
+        fileUploadBox.addEventListener("click", () => fileInput.click());
 
-        function drawWaveform() {
-            requestAnimationFrame(drawWaveform); // Creates an animation loop
+        fileUploadBox.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
 
-            ctx.clearRect(0, 0, width, height); // Clear the canvas 
-            ctx.beginPath();
-            ctx.moveTo(0, height / 2); // Start at the middle
-
-            // Sine wave with oscillating amplitude
-            for (let x = 0; x < width; x++) {
-                const y = height / 2 + Math.sin(x / 20 + offset) * ((height / 4) * Math.sin(offset / 5));
-                ctx.lineTo(x, y);
+        fileUploadBox.addEventListener("drop", (e) => {
+            const file = e.dataTransfer.files;
+            if (!file.type.startWith("audio/")) {
+                alert("Please Drop only audio files.");
+                return;
             }
-
-            ctx.strokeStyle = '#1c2541'; // Match your existing color scheme
-            ctx.stroke(); 
-
-            offset += 0.1; // Increment to make the wave move
-        }
-
-        drawWaveform(); // Start the animation
+            console.log(file)
+        })
 
     </script>  
+
     <style>
         nav ul li a {
               padding: 0 15px;
