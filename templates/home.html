@@ -15,7 +15,6 @@
         <div style = "color: #f5cda7; font-size: 47px; padding: 120px 30px;">
             Your AI powered ally for respiratory health
         </div>
-        <form id="uploadForm" enctype="multipart/form-data">
             <div style = "background-color: #4f9d69; 
             border: 2px dashed #68d89b; 
             padding: 100px 50px; 
@@ -25,8 +24,9 @@
                 <input type="file" name="file" id="audioFile" style = "display: none;"/>
                 <p id="fileStatus">Drop your audio file</p>
             </div>
+        <form id="uploadForm" enctype="multipart/form-data">
 
-            <div>
+            <div style="text-align: right;">
                 <button id="submit" type="submit">Submit</button>
             </div>
         </form>
@@ -59,6 +59,13 @@
             }
         }
 
+        fileInput.addEventListener("change", () => {
+            const file = fileInput.files[0];
+            if (!checkFile(file)) {return;}
+            document.getElementById("fileStatus").textContent = file.name;
+
+        })
+
         fileUploadBox.addEventListener("click", () => fileInput.click());
 
         fileUploadBox.addEventListener("dragover", (e) => {
@@ -86,28 +93,34 @@
 
         async function process(file) {
             const formData = new FormData(uploadForm);
+            formData.append("file", file)
             try {
             const response = await fetch('/assess', {
                 method: 'POST',
                 body: formData 
             });
 
-            if (response.ok) {
+            if (response.status === 200) {
                 const result = await response.json(); 
                 console.log("API Response:", result);
-
 
                 displayResults(result); 
             } 
             else {
+                const result = await response.json();
                 console.error("API Error:", response.status);
+                alert(result["error"]);
             }
 
         } 
             catch (error) {
                 console.error("Error sending file:", error);
+                aler("in catch")
             }
     }
+        function displayResults (result) {
+            alert(`You may have ${result["result"]}. Please consult a medical professional as soon as possible`)
+        }
 
     </script>  
 
