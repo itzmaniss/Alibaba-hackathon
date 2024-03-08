@@ -1,2 +1,5 @@
+flagged/
+.vscode/
+__pycache__/
 .env
 venv/
